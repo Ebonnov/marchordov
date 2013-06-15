@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns = "http://www.w3.org/1999/xhtml">
+<head>
+</head>
+<body>
+  {% block includes %}
+  <script type=text/javascript src="{{
+      url_for('static', filename='jquery.js') }}"></script>
+  <script type=text/javascript src="{{
+    url_for('static', filename='MIDI.js/js/MIDI/AudioDetect.js') }}">
+  </script>
+  <script type=text/javascript src="{{
+    url_for('static', filename='MIDI.js/js/MIDI/LoadPlugin.js') }}">
+  </script>
+  <script type=text/javascript src="{{
+    url_for('static', filename='MIDI.js/js/MIDI/Player.js') }}">
+  </script>
+  <script type=text/javascript src="{{
+    url_for('static', filename='MIDI.js/js/MIDI/Plugin.js') }}">
+  </script>
+  <script type=text/javascript src="{{
+    url_for('static', filename='MIDI.js/js/Window/DOMLoader.XMLHttp.js') }}">
+  </script>
+  <script type=text/javascript src="{{
+    url_for('static', filename='MIDI.js/js/Window/DOMLoader.script.js') }}">
+  </script>
+  <script type=text/javascript src="{{
+    url_for('static', filename='MIDI.js/inc/Base64.js') }}">
+  </script>
+  <script type=text/javascript src="{{
+    url_for('static', filename='MIDI.js/inc/base64binary.js') }}">
+  </script>
+  <script type=text/javascript>
+      $SCRIPT_ROOT = {{ request.url_root|tojson|safe }};
+  </script>
+  {% endblock includes %}
+  {% block code %} {% endblock code %}
+</body>
+</html>

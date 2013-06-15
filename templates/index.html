@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block code %}
+  <script type=text/javascript>
+    $(function() {
+      $('#result').text('loading...');
+      var last_result;
+      var generate_bound_answer = function($endpoint, $answer_data) {
+        return function() {
+          $.getJSON($endpoint, $answer_data,
+            function(data) {
+              if(data.error) {
+                $('#result').text('Error! ' + data.error);
+              } else {
+                $('#result').text(data.result);
+              }
+            });
+          return false;
+        }
+      };
+      $('a#replay').hide();
+      MIDI.loadPlugin({
+        soundfontUrl: "{{url_for('static', filename='MIDI.js/soundfont/')}}",
+        instrument: 'acoustic_grand_piano',
+        callback: function() {
+          $('#result').text('ready!');
+          MIDI.setVolume(0, 127);
+          $('a#generate').bind('click', function() {
+            $('#selections').empty();
+            $.getJSON($SCRIPT_ROOT + '_generatefirstquestion', {},
+              function(data) {
+                last_result = data.chord;
+                $('a#replay').show();
+                MIDI.chordOn(0, data.chord, 127, 0);
+                choices = data.choice;
+                for (i=0; i<choices.length; i++) {
+                  $('#selections').append(
+                    '<div><a href=# id=answer'+i+'>' + choices[i] + '</div>');
+                  $('a#answer'+i).bind('click', generate_bound_answer(
+                    $SCRIPT_ROOT + '_answerfirstquestion',
+                    {'answer': i}));
+                  $('a#answer'+i).bind('click', function() {
+                    last_result = null;
+                    $('#selections').empty();
+                  });
+                }
+              });
+            return false;
+          });
+          $('a#replay').bind('click', function() {
+            if (last_result) {
+              MIDI.chordOn(0, last_result, 127, 0);
+            }
+            return false;
+          });
+        }
+      });
+    });
+  </script>
+  <h1>Just some random chords, interactive</h1>
+  <p><span id=result><span>
+  <div id=selections></div>
+  <p><a href=# id=generate>generate</a>
+  <p><a href=# id=replay>replay</a>
+{% endblock code %}
