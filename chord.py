@@ -1,6 +1,12 @@
+import logging
 import random
 from flask import abort, Flask, jsonify, request, render_template, session
 app = Flask(__name__)
+
+if not app.debug:
+  file_handler = logging.FileHandler('dummy_log')
+  file_handler.setLevel(logging.WARNING)
+  app.logger.addHandler(file_handler)
 
 @app.route('/')
 def index():
