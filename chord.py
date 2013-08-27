@@ -8,6 +8,8 @@ if not app.debug:
   file_handler.setLevel(logging.WARNING)
   app.logger.addHandler(file_handler)
 
+app.config.from_object('config.DefaultConfig')
+
 @app.route('/')
 def index():
   return render_template('index.html')
@@ -57,9 +59,6 @@ def answer_first_question():
     return jsonify(result='No. You answered %s, %s was generated instead' %
         (answer_tooltip, expected_tooltip)
         )
-
-with open('secret') as secret_file:
-  app.secret_key = secret_file.readline().rstrip('\n')
 
 if __name__ == '__main__':
   app.run()
