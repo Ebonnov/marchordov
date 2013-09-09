@@ -32,7 +32,7 @@ def first_question():
     chord = [base, base + 3 + answer, base + 7]
   choice = ['minor', 'major', 'diminished']
   session['expected'] = answer
-  return jsonify(chord=chord, choice=choice)
+  return jsonify(chord=chord, choice=choice, endpoint='_answerfirstquestion')
 
 @app.route('/_answerfirstquestion')
 def answer_first_question():

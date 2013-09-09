@@ -36,7 +36,7 @@
                   $('#selections').append(
                     '<div><a href=# id=answer'+i+'>' + choices[i] + '</div>');
                   $('a#answer'+i).bind('click', generate_bound_answer(
-                    $SCRIPT_ROOT + '_answerfirstquestion',
+                    $SCRIPT_ROOT + data.endpoint,
                     {'answer': i}));
                   $('a#answer'+i).bind('click', function() {
                     last_result = null;
