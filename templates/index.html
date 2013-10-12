@@ -17,6 +17,50 @@
           return false;
         }
       };
+      var fetch_question = function($question_endpoint) {
+        return function() {
+          $('#selections').empty();
+          $.getJSON($SCRIPT_ROOT + $question_endpoint, {},
+            function(data) {
+              last_result = data.chord;
+              $('a#replay').show();
+              MIDI.chordOn(0, data.chord, 127, 0);
+              choices = data.choice;
+              for (i=0; i<choices.length; i++) {
+                $('#selections').append(
+                  '<div><a href=# id=answer'+i+'>' + choices[i] + '</div>');
+                $('a#answer'+i).bind('click', generate_bound_answer(
+                  $SCRIPT_ROOT + data.endpoint,
+                  {'answer': i}));
+                $('a#answer'+i).bind('click', function() {
+                  last_result = null;
+                  $('#selections').empty();
+                });
+              }
+            });
+          return false;
+        };
+      }
+      var create_session = function($session_name) {
+        return function() {
+          $.getJSON($SCRIPT_ROOT + '_create_session',
+            {'session_name': $session_name},
+            function(data) {
+              if (data.error) {
+                $('#result').text(data.error);
+                return false;
+              }
+              $('a#generate').unbind('click');
+              $('a#generate').bind('click',
+                fetch_question(data.endpoint));
+              if (data.baseprint) {
+                MIDI.chordOn(0, data.baseprint, 127, 0);
+              }
+              $('#currentsession').text('Current:' + $session_name);
+            });
+          return false;
+        };
+      }
       $('a#replay').hide();
       MIDI.loadPlugin({
         soundfontUrl: "{{url_for('static', filename='MIDI.js/soundfont/')}}",
@@ -24,26 +68,20 @@
         callback: function() {
           $('#result').text('ready!');
           MIDI.setVolume(0, 127);
-          $('a#generate').bind('click', function() {
-            $('#selections').empty();
-            $.getJSON($SCRIPT_ROOT + '_generatefirstquestion', {},
-              function(data) {
-                last_result = data.chord;
-                $('a#replay').show();
-                MIDI.chordOn(0, data.chord, 127, 0);
-                choices = data.choice;
-                for (i=0; i<choices.length; i++) {
-                  $('#selections').append(
-                    '<div><a href=# id=answer'+i+'>' + choices[i] + '</div>');
-                  $('a#answer'+i).bind('click', generate_bound_answer(
-                    $SCRIPT_ROOT + data.endpoint,
-                    {'answer': i}));
-                  $('a#answer'+i).bind('click', function() {
-                    last_result = null;
-                    $('#selections').empty();
-                  });
-                }
-              });
+          $.getJSON($SCRIPT_ROOT + '_query_session', {},
+            function(data) {
+              if (data.session) {
+                $('#currentsession').text('Current:' + data.session);
+              } else {
+                $('#currentsession').text('Current:None');
+              }
+            });
+          $('a#dummy').bind('click', create_session('dummy'));
+          $('a#inkey').bind('click', create_session('inkey'));
+          $('a#endsession').bind('click', function() {
+            $.getJSON($SCRIPT_ROOT + '_clear_session', {}, function(data) {
+              $('#currentsession').text('Current:None')
+            });
             return false;
           });
           $('a#replay').bind('click', function() {
@@ -57,6 +95,13 @@
     });
   </script>
   <h1>Just some random chords, interactive</h1>
+  <!-- gonna load this bar. TODO -->
+  <div>
+    <span id=currentsession> </span>
+    <a href=# id=dummy>dummy</a>
+    <a href=# id=inkey>inkey</a>
+    <a href=# id=endsession>end current session</a>
+  </div>
   <p><span id=result><span>
   <div id=selections></div>
   <p><a href=# id=generate>generate</a>
