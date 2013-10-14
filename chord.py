@@ -85,7 +85,7 @@ inkey_chords = [
     ([5, 8, 12], 'iv'),
     ([7, 11, 14], 'V'),
     ([8, 12, 15], 'VI'),
-    ([11, 14, 18], 'vii'),
+    ([11, 14, 17], 'vii-'),
   ],[
     ([0, 4, 7], 'I'),
     ([2, 5, 9], 'ii'),
@@ -146,14 +146,15 @@ def answer_inkey_question():
 @app.route('/_create_session')
 def create_session():
   if 'session' in session:
-    return jsonify(error='fur')
+    return jsonify(
+      error='Another session is ongoing. Click "end current session" to end.')
   session_name_supported = {
     'dummy': create_dummy_session,
     'inkey': create_inkey_session,
   }
   name = request.args.get('session_name', None)
   if name not in session_name_supported:
-    return jsonify(error='furfur')
+    return jsonify(error='session name {} is not supported'.format(name))
   session['session'] = name
   return session_name_supported[name]()
 
